@@ -73,6 +73,11 @@ namespace NHaml.Web.Mvc
                 "~/Views/Shared/{0}.haml"
             };
 
+            AreaMasterLocationFormats = new [] 
+            { 
+                "~/Areas/{2}/Views/Shared/{0}.haml" 
+            };
+
             PartialViewLocationFormats = ViewLocationFormats;
             AreaPartialViewLocationFormats = AreaViewLocationFormats;
 		}
