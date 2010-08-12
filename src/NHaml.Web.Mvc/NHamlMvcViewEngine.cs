@@ -56,10 +56,28 @@ namespace NHaml.Web.Mvc
 
         private void InitializeViewLocations()
         {
+            AreaMasterLocationFormats = new [] 
+            { 
+                "~/Areas/{2}/Views/Shared/{0}.haml",
+                "~/Areas/{2}/Views/Shared/application.haml"
+            };
+
             AreaViewLocationFormats = new[]
             {
                 "~/Areas/{2}/Views/{1}/{0}.haml",
                 "~/Areas/{2}/Views/Shared/{0}.haml"
+            };
+            
+            AreaPartialViewLocationFormats = new[]
+            {
+                "~/Areas/{2}/Views/{1}/_{0}.haml",
+                "~/Areas/{2}/Views/Shared/_{0}.haml"
+            };
+
+            MasterLocationFormats = new[]
+            {
+                "~/Views/Shared/{0}.haml",
+                "~/Views/Shared/application.haml"
             };
 
             ViewLocationFormats = new[]
@@ -68,46 +86,35 @@ namespace NHaml.Web.Mvc
                 "~/Views/Shared/{0}.haml"
             };
 
-            MasterLocationFormats = new[]
-            {
-                "~/Views/Shared/{0}.haml"
-            };
-
-            AreaMasterLocationFormats = new [] 
-            { 
-                "~/Areas/{2}/Views/Shared/{0}.haml" 
-            };
-
             PartialViewLocationFormats = new[]
             {
                 "~/Views/{1}/_{0}.haml",
-                "~/Views/Shared/_{0}.haml"
+                "~/Views/Shared/_{0}.haml",
             };
 
-            AreaPartialViewLocationFormats = new[]
-            {
-                "~/Areas/{2}/Views/{1}/_{0}.haml",
-                "~/Areas/{2}/Views/Shared/_{0}.haml"
-            };
 		}
 
-        public override ViewEngineResult FindView(ControllerContext controllerContext, string viewName, string masterName, bool useCache)
-        {
-            if (string.IsNullOrEmpty(masterName))
-            {
-                var controllerName = controllerContext.RouteData.GetRequiredString("controller");
-                var result = base.FindView(controllerContext, viewName, controllerName, useCache);
+        //public override ViewEngineResult FindView(ControllerContext controllerContext, string viewName, string masterName, bool useCache)
+        //{
+        //    if (string.IsNullOrEmpty(masterName))
+        //    {
+        //        var controllerName = controllerContext.RouteData.GetRequiredString("controller");
+        //        var result = base.FindView(controllerContext, viewName, controllerName, useCache);
 
-                if (result.View == null)
-                {
-                    result = base.FindView(controllerContext, viewName, DefaultMaster, useCache);
-                }
+        //        if (result.View == null)
+        //        {
+        //            result = base.FindView(controllerContext, viewName, DefaultMaster, useCache);
+        //        }
 
-                return result.View == null ? base.FindPartialView(controllerContext, viewName, useCache) : result;
-            }
+        //        if (result.View == null)
+        //        {
+        //            result = base.FindPartialView(controllerContext, viewName, useCache);
+        //        }
+        //        return result;
+        //    }
 
-            return base.FindView(controllerContext, viewName, masterName, useCache);
-        }
+        //    return base.FindView(controllerContext, viewName, masterName, useCache);
+        //}
 
         protected override IView CreatePartialView(ControllerContext controllerContext, string partialPath)
         {
@@ -118,9 +125,14 @@ namespace NHaml.Web.Mvc
 
         protected override IView CreateView(ControllerContext controllerContext, string viewPath, string masterPath)
         {
-            viewPath = VirtualPathToPhysicalPath(controllerContext.RequestContext, viewPath);
-            masterPath = VirtualPathToPhysicalPath(controllerContext.RequestContext, masterPath);
-            return (IView)_templateEngine.Compile(new List<string>{ masterPath, viewPath}, GetViewBaseType(controllerContext)).CreateInstance();
+            var paths = new List<string>();
+            if (masterPath != "")
+            { 
+                paths.Add(VirtualPathToPhysicalPath(controllerContext.RequestContext, masterPath));
+            }
+            paths.Add(VirtualPathToPhysicalPath(controllerContext.RequestContext, viewPath));
+
+            return (IView) _templateEngine.Compile(paths, GetViewBaseType(controllerContext)).CreateInstance();
         }
 
         protected virtual Type ViewGenericBaseType
