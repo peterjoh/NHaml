@@ -58,8 +58,7 @@ namespace NHaml.Web.Mvc
         {
             AreaMasterLocationFormats = new [] 
             { 
-                "~/Areas/{2}/Views/Shared/{0}.haml",
-                "~/Areas/{2}/Views/Shared/application.haml"
+                "~/Areas/{2}/Views/Shared/{0}.haml"
             };
 
             AreaViewLocationFormats = new[]
@@ -76,8 +75,7 @@ namespace NHaml.Web.Mvc
 
             MasterLocationFormats = new[]
             {
-                "~/Views/Shared/{0}.haml",
-                "~/Views/Shared/application.haml"
+                "~/Views/Shared/{0}.haml"
             };
 
             ViewLocationFormats = new[]
@@ -115,6 +113,11 @@ namespace NHaml.Web.Mvc
 
         //    return base.FindView(controllerContext, viewName, masterName, useCache);
         //}
+
+        public override ViewEngineResult FindView(ControllerContext controllerContext, string viewName, string masterName, bool useCache)
+        {
+            return base.FindView(controllerContext, viewName, masterName, useCache);
+        }
 
         protected override IView CreatePartialView(ControllerContext controllerContext, string partialPath)
         {
